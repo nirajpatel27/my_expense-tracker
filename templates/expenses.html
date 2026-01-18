@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses{% endblock %}
+
+{% block content %}
+<div class="container wide">
+    <h2>All Expenses</h2>
+<div class="filters-card">
+    <form method="get" class="filters-toolbar">
+
+        <select name="sort">
+            <option value="newest" {% if selected.sort == "newest" %}selected{% endif %}>Newest</option>
+            <option value="oldest" {% if selected.sort == "oldest" %}selected{% endif %}>Oldest</option>
+        </select>
+
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+                <option value="{{ cat }}" {% if selected.category == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="year">
+            <option value="">All Years</option>
+            {% for y in years %}
+                <option value="{{ y }}" {% if selected.year == y %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="month">
+            <option value="">All Months</option>
+            {% for m in range(1,13) %}
+                <option value="{{ m }}" {% if selected.month == m %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="date" name="date" value="{{ selected.date or '' }}">
+
+        <button type="submit">Apply</button>
+        <a href="{{ url_for('view_expenses') }}" class="reset">Reset</a>
+
+    </form>
+</div>
+
+{% if not expenses %}
+    <p class="empty">No expenses found for selected filters.</p>
+{% endif %}
+
+   <table class="expenses-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Payment</th>
+            <th>Amount</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exp in expenses %}
+        <tr>
+            <td>{{ exp.date }}</td>
+            <td><span class="badge">{{ exp.category }}</span></td>
+            <td>{{ exp.description or "-" }}</td>
+            <td>{{ exp.payment_mode }}</td>
+            <td class="amount">₹{{ exp.amount }}</td>
+            <td>
+                <a href="{{ url_for('delete_expense', expense_id=exp._id) }}" class="delete">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{% endblock %}

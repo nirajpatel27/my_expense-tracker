@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Shared Expenses{% endblock %}
+
+{% block content %}
+<div class="page">
+
+    <!-- Page Header -->
+    <div class="page-header shared-header">
+        <h2>Shared Expenses</h2>
+
+        <div class="header-actions">
+            <a href="{{ url_for('add_shared_expense') }}" class="btn secondary">
+                + Add Shared Expense
+            </a>
+            <a href="{{ url_for('shared_balances') }}" class="btn">
+                View Balances
+            </a>
+        </div>
+    </div>
+    <form method="get" class="filters-toolbar">
+
+        <select name="sort">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+        </select>
+
+        <select name="status">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="settled">Settled</option>
+        </select>
+
+        <select name="participant">
+            <option value="">All Participants</option>
+            {% for p in participants %}
+            <option value="{{ p }}">{{ p }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Apply</button>
+    </form>
+
+    <hr>
+
+    <!-- Shared Expense Cards -->
+    <div class="shared-list">
+
+        {% for exp in expenses %}
+        <div class="shared-card">
+
+            <!-- LEFT -->
+            <div class="shared-left">
+                <div class="shared-title">{{ exp.title }}</div>
+
+                <div class="shared-meta">
+                    <span>Paid by <strong>{{ exp.paid_by }}</strong></span>
+                    <span class="dot">•</span>
+                    <span>Paid on {{ exp.date | replace("-", "-") }}</span>
+                </div>
+
+                {% if exp.is_settled and exp.settled_at %}
+                <div class="shared-meta settled-date">
+                    Settled on {{ exp.settled_at | replace("-", " ") }}
+                </div>
+                {% endif %}
+
+                <div class="shared-participants">
+                    <div class="shared-participants">
+                        <span class="label">Split with:</span>
+                        <span class="names">
+                            {% set others = exp.participants | reject("equalto", exp.paid_by) | list %}
+                            {{ others | join(", ") }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- MIDDLE -->
+            <div class="shared-middle">
+                <div>Total: ₹{{ exp.total_amount }}</div>
+                <div>Per person: ₹{{ exp.per_person_amount }}</div>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="shared-right">
+                {% if exp.is_settled %}
+                <span class="status settled">Settled</span>
+                {% else %}
+                <a href="{{ url_for('settle_shared_expense', expense_id=exp._id) }}" class="btn small">
+                    Settle
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+
+        {% if not expenses %}
+        <p class="empty">No shared expenses yet.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Balances{% endblock %}
+
+{% block content %}
+<div class="page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>Net Balances</h2>
+        <p class="subtitle">Who owes whom after all shared expenses</p>
+    </div>
+
+    <!-- Balance Cards -->
+    <div class="balance-list">
+
+        {% for person, amount in balances.items() %}
+        <div class="balance-card">
+
+            <div class="balance-name">
+                {{ person }}
+            </div>
+
+            <div class="balance-status">
+                {% if amount > 0 %}
+                    <span class="receive">
+                        Gets ₹{{ amount }}
+                    </span>
+                {% elif amount < 0 %}
+                    <span class="owe">
+                        Owes ₹{{ -amount }}
+                    </span>
+                {% else %}
+                    <span class="settled">
+                        Settled
+                    </span>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+
+        {% if not balances %}
+            <p class="empty">No balances to show.</p>
+        {% endif %}
+
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('view_shared_expenses') }}" class="btn secondary">
+            ← Back to Shared Expenses
+        </a>
+    </div>
+
+</div>
+{% endblock %}

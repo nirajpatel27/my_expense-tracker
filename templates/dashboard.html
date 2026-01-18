@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h2>Dashboard</h2>
+
+        <form method="get">
+            <select name="year" onchange="this.form.submit()">
+                {% for y in available_years %}
+                    <option value="{{ y }}" {% if y == year %}selected{% endif %}>
+                        {{ y }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="cards">
+        <div class="card">
+            <h4>This Month</h4>
+            <p>{{ monthly_total if monthly_total else "—" }}</p>
+        </div>
+
+        <div class="card">
+            <h4>This Year</h4>
+            <p>{{ yearly_total }}</p>
+        </div>
+
+        <div class="card">
+            <h4>Avg / Month</h4>
+            <p>{{ avg_monthly_spend }}</p>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts">
+        <div class="chart-box">
+            <h3>Monthly Expense Trend</h3>
+            <canvas id="monthlyChart" height="140"></canvas>
+        </div>
+
+        <div class="chart-box">
+            <h3>Category-wise Spending</h3>
+            <canvas id="categoryChart" height="140"></canvas>
+        </div>
+    </div>
+
+    <!-- Insights -->
+    <div class="insights">
+        <h3>Insights</h3>
+        <p><strong>Highest Spending Month:</strong> {{ highest_month }} (₹{{ highest_month_amount }})</p>
+        <p><strong>Top Category:</strong> {{ top_category }} (₹{{ top_category_amount }})</p>
+        <p><strong>Average Monthly Spend:</strong> ₹{{ avg_monthly_spend }}</p>
+    </div>
+
+    {% if budget_alerts %}
+    <div class="alerts">
+        <h3>⚠ Budget Alerts</h3>
+        <ul>
+            {% for alert in budget_alerts %}
+                <li>{{ alert.category }}: ₹{{ alert.spent }} / ₹{{ alert.limit }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- 🔐 SAFE DATA TRANSFER (Jinja → JS) -->
+<script type="application/json" id="chart-data">
+{
+    "monthly": {
+        "labels": {{ monthly_chart.labels | tojson }},
+        "data": {{ monthly_chart.data | tojson }}
+    },
+    "category": {
+        "labels": {{ category_chart.labels | tojson }},
+        "data": {{ category_chart.data | tojson }}
+    }
+}
+</script>
+
+<!-- 📊 CHART.JS LOGIC -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const chartData = JSON.parse(
+        document.getElementById("chart-data").textContent
+    );
+
+    // Monthly Line Chart
+    const monthlyCanvas = document.getElementById("monthlyChart");
+    if (monthlyCanvas) {
+        new Chart(monthlyCanvas.getContext("2d"), {
+            type: "line",
+            data: {
+                labels: chartData.monthly.labels,
+                datasets: [{
+                    label: "Monthly Expense",
+                    data: chartData.monthly.data,
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            }
+        });
+    }
+
+    // Category Pie Chart
+    const categoryCanvas = document.getElementById("categoryChart");
+    if (categoryCanvas) {
+        new Chart(categoryCanvas.getContext("2d"), {
+            type: "pie",
+            data: {
+                labels: chartData.category.labels,
+                datasets: [{
+                    data: chartData.category.data
+                }]
+            }
+        });
+    }
+
+});
+</script>
+{% endblock %}

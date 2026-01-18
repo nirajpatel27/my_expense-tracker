@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense{% endblock %}
+
+{% block content %}
+<div class="form-page">
+
+    <div class="form-card">
+        <h2>Add Expense</h2>
+
+        <form method="POST" class="expense-form">
+
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" step="0.01" name="amount" placeholder="₹0.00" required>
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category">
+                    <option>Food</option>
+                    <option>Travel</option>
+                    <option>Rent</option>
+                    <option>Shopping</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" name="description" placeholder="Optional note">
+            </div>
+
+            <div class="form-group">
+                <label>Payment Mode</label>
+                <select name="payment_mode">
+                    <option>Cash</option>
+                    <option>UPI</option>
+                    <option>Card</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="date" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Add Expense</button>
+                <button type="reset">Clear</button>
+                
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}
