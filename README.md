@@ -96,3 +96,18 @@ expense-tracker/
 │ ├── css/
 │
 
+
+## Configure Environment Variables
+
+python -m venv venv
+source venv/bin/activate   # Linux / Mac
+venv\Scripts\activate      # Windows
+
+## Run the Application
+
+python app.py
+
+
+
+
+
