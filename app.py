@@ -162,7 +162,7 @@ def calculate_net_balances():
 # Routes — Dashboard
 # =========================================================
 
-@app.route("/dashboard")
+@app.route("/")
 def dashboard():
     current_year, current_month = now_year_month()
     year = request.args.get("year", type=int, default=current_year)
@@ -202,7 +202,7 @@ def dashboard():
 # Routes — Personal Expenses
 # =========================================================
 
-@app.route("/")
+@app.route("/add_expense")
 def home():
     return redirect(url_for("add_expense"))
 
