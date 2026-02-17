@@ -76,6 +76,7 @@ It helps users track **personal expenses**, manage **shared expenses**, view **m
 
 ## 📂 Project Structure
 
+'''
 expense-tracker/
 │
 ├── app.py
@@ -95,7 +96,7 @@ expense-tracker/
 ├── static/
 │ ├── css/
 │
-
+'''
 
 ## Configure Environment Variables
 
