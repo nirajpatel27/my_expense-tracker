@@ -3,4 +3,5 @@ venv/
 __pycache__/
 *.txt
 !requirements.txt
+seed_data.py
 

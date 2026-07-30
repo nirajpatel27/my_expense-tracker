@@ -45,23 +45,23 @@ def month_name(num):
 
 
 def get_monthly_total(month, year):
-    return sum(
+    return round(sum(
         exp["amount"] for exp in expenses_collection.find({
             "month": month,
             "year": year,
             "is_deleted": False,
             "is_shared": False
         })
-    )
+    ), 2)
 
 def get_yearly_total(year):
-    return sum(
+    return round(sum(
         exp["amount"] for exp in expenses_collection.find({
             "year": year,
             "is_deleted": False,
             "is_shared": False
         })
-    )
+    ), 2)
 
 def get_category_totals(month=None, year=None):
     query = {"is_deleted": False, "is_shared": False}
@@ -72,7 +72,7 @@ def get_category_totals(month=None, year=None):
 
     totals = {}
     for exp in expenses_collection.find(query):
-        totals[exp["category"]] = totals.get(exp["category"], 0) + exp["amount"]
+        totals[exp["category"]] = round(totals.get(exp["category"], 0) + exp["amount"], 2)
     return totals
 
 def get_monthly_breakdown(year):
@@ -87,7 +87,7 @@ def get_monthly_breakdown(year):
         "is_shared": False
     }):
         if exp["month"] <= months_to_show:
-            breakdown[month_name(exp["month"])] += exp["amount"]
+            breakdown[month_name(exp["month"])] = round(breakdown[month_name(exp["month"])] + exp["amount"], 2)
 
     return breakdown
 
@@ -96,14 +96,14 @@ def highest_spending_month(year):
     if not data:
         return None, 0
     m = max(data, key=data.get)
-    return m, data[m]
+    return m, round(data[m], 2)
 
 def highest_spending_category(year):
     data = get_category_totals(year=year)
     if not data:
         return None, 0
     c = max(data, key=data.get)
-    return c, data[c]
+    return c, round(data[c], 2)
 
 def average_monthly_spend(year):
     current_year, current_month = now_year_month()
@@ -126,7 +126,7 @@ def budget_alerts(month, year):
     totals = get_category_totals(month=month, year=year)
 
     for b in budgets_collection.find():
-        spent = totals.get(b["category"], 0)
+        spent = round(totals.get(b["category"], 0), 2)
         if spent > b["monthly_limit"]:
             alerts.append({
                 "category": b["category"],
@@ -318,10 +318,14 @@ def view_shared_expenses():
 
     expenses = list(shared_collection.find(query).sort("created_at", order))
 
+    all_participants = sorted(set(
+        name for group in shared_collection.distinct("participants") for name in group
+    ))
+
     return render_template(
         "shared_expenses.html",
         expenses=expenses,
-        participants=shared_collection.distinct("participants"),
+        participants=all_participants,
         selected={
             "sort": sort,
             "participant": participant,

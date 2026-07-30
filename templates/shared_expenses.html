@@ -66,14 +66,11 @@
                 {% endif %}
 
                 <div class="shared-participants">
-                    <div class="shared-participants">
-                        <span class="label">Split with:</span>
-                        <span class="names">
-                            {% set others = exp.participants | reject("equalto", exp.paid_by) | list %}
-                            {{ others | join(", ") }}
-                        </span>
-                    </div>
-
+                    <span class="label">Split with:</span>
+                    <span class="names">
+                        {% set others = exp.participants | reject("equalto", exp.paid_by) | list %}
+                        {{ others | join(", ") }}
+                    </span>
                 </div>
             </div>
 

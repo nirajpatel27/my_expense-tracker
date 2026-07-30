@@ -54,19 +54,49 @@
     <!-- Insights -->
     <div class="insights">
         <h3>Insights</h3>
-        <p><strong>Highest Spending Month:</strong> {{ highest_month }} (₹{{ highest_month_amount }})</p>
-        <p><strong>Top Category:</strong> {{ top_category }} (₹{{ top_category_amount }})</p>
-        <p><strong>Average Monthly Spend:</strong> ₹{{ avg_monthly_spend }}</p>
+        <div class="insight-grid">
+            <div class="insight-item">
+                <i class="fas fa-calendar-alt"></i>
+                <div>
+                    <span class="insight-label">Highest Spending Month</span>
+                    <span class="insight-value">{{ highest_month }} <small>(₹{{ highest_month_amount }})</small></span>
+                </div>
+            </div>
+            <div class="insight-item">
+                <i class="fas fa-tags"></i>
+                <div>
+                    <span class="insight-label">Top Category</span>
+                    <span class="insight-value">{{ top_category }} <small>(₹{{ top_category_amount }})</small></span>
+                </div>
+            </div>
+            <div class="insight-item">
+                <i class="fas fa-chart-line"></i>
+                <div>
+                    <span class="insight-label">Average Monthly Spend</span>
+                    <span class="insight-value">₹{{ avg_monthly_spend }}</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     {% if budget_alerts %}
     <div class="alerts">
-        <h3>⚠ Budget Alerts</h3>
-        <ul>
+        <h3><i class="fas fa-exclamation-triangle"></i> Budget Alerts</h3>
+        <div class="alert-list">
             {% for alert in budget_alerts %}
-                <li>{{ alert.category }}: ₹{{ alert.spent }} / ₹{{ alert.limit }}</li>
+                {% set pct = ((alert.spent / alert.limit) * 100) | round(0) | int %}
+                <div class="alert-item">
+                    <div class="alert-info">
+                        <span class="alert-cat">{{ alert.category }}</span>
+                        <span class="alert-nums">₹{{ alert.spent }} / ₹{{ alert.limit }}</span>
+                    </div>
+                    <div class="alert-bar-bg">
+                        <div class="alert-bar-fill {% if pct > 150 %}over{% elif pct > 100 %}warn{% endif %}" style="width: {{ [pct, 100] | min }}%"></div>
+                    </div>
+                    <span class="alert-pct">{{ pct }}%</span>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
     {% endif %}
 
@@ -104,9 +134,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 datasets: [{
                     label: "Monthly Expense",
                     data: chartData.monthly.data,
+                    borderColor: "#4f46e5",
+                    backgroundColor: "rgba(79, 70, 229, 0.1)",
                     borderWidth: 2,
-                    tension: 0.3
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: "#4f46e5",
+                    pointBorderColor: "#fff",
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 7
                 }]
+            },
+            options: {
+                responsive: true,
+                animation: {
+                    duration: 1500,
+                    easing: "easeInOutQuart"
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: "rgba(0,0,0,0.05)" }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: "index"
+                }
             }
         });
     }
@@ -115,12 +176,33 @@ document.addEventListener("DOMContentLoaded", function () {
     const categoryCanvas = document.getElementById("categoryChart");
     if (categoryCanvas) {
         new Chart(categoryCanvas.getContext("2d"), {
-            type: "pie",
+            type: "doughnut",
             data: {
                 labels: chartData.category.labels,
                 datasets: [{
-                    data: chartData.category.data
+                    data: chartData.category.data,
+                    backgroundColor: [
+                        "#4f46e5", "#10b981", "#f59e0b", "#ef4444",
+                        "#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#84cc16"
+                    ],
+                    borderWidth: 2,
+                    borderColor: "#ffffff"
                 }]
+            },
+            options: {
+                responsive: true,
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 1800,
+                    easing: "easeOutBounce"
+                },
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { padding: 16, usePointStyle: true }
+                    }
+                }
             }
         });
     }
